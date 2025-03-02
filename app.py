@@ -13,8 +13,8 @@ class ImageApp(QWidget):
         super().__init__()
 
         self.logo_label = QLabel(self)
-        self.logo_pixmap = QPixmap("logo.png")  # ✅ Replace with your image file
-        self.logo_label.setPixmap(self.logo_pixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
+        self.logo_pixmap = QPixmap("logo.png") 
+        self.logo_label.setPixmap(self.logo_pixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
         self.logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
@@ -23,7 +23,7 @@ class ImageApp(QWidget):
         self.categorized_images = {}
         self.view_by_category = False
         self.current_category = None
-        self.kept_images = set()  # ✅ Store kept images so they won't be displayed again
+        self.kept_images = set()  
 
 
         # UI Elements
@@ -32,7 +32,6 @@ class ImageApp(QWidget):
         self.setAcceptDrops(True)  # Enable Drag & Drop
         self.setStyleSheet("background-color: #806294; color: #ECE8ED;")
 
-        # ✅ Add a border frame around the app
         self.setStyleSheet("""
             QWidget {
                 background-color: #806294; 
@@ -46,13 +45,13 @@ class ImageApp(QWidget):
         # Image Display
         self.image_label = QLabel("Drag & Drop Images Here", self)
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # self.image_label.setStyleSheet("border: 2px dashed #C3B5D6; background-color: #C3B5D6; padding: 10px;")
-        self.image_label.setStyleSheet("""
-            border: 4px solid #C3B5D6; 
-            background-color: #C3B5D6; 
-            padding: 10px;
-            border-radius: 8px;
-        """)
+        # self.image_label.setStyleSheet("border: 2px dashed #C3B5D6; background-color: #C3B5D6; padding: 10px; border-radius: 8px;")
+        # self.image_label.setStyleSheet("""
+        #     border: 4px solid #C3B5D6; 
+        #     background-color: #C3B5D6; 
+        #     padding: 10px;
+        #     border-radius: 8px;
+        # """)
 
         self.setStyleSheet("""
             QWidget {
@@ -60,7 +59,7 @@ class ImageApp(QWidget):
                 color: #ECE8ED;
                 border: 5px solid #9E76DB;
                 border-radius: 10px;
-                background-image: url('background.jpg'); /* ✅ Replace with your background image */
+                background-image: url('background.jpg'); 
                 background-position: center;
                 background-repeat: no-repeat;
                 background-size: cover;
@@ -96,7 +95,7 @@ class ImageApp(QWidget):
         self.delete_button.clicked.connect(self.delete_image)
         self.delete_button.setEnabled(False)
 
-        self.next_button = QPushButton("➡ Next")
+        self.next_button = QPushButton("🔁 Repeat")
         self.next_button.clicked.connect(self.next_image)
         self.next_button.setEnabled(False)
 
@@ -121,33 +120,36 @@ class ImageApp(QWidget):
 
         # Layout
         layout = QVBoxLayout()
-        layout.addWidget(self.logo_label)  # ✅ Add to layout
-        layout.addWidget(self.image_label)
+        
         layout.addWidget(self.category_label)
         layout.addWidget(self.count_label)
         layout.addWidget(self.upload_file_button)
         layout.addWidget(self.upload_folder_button)
         layout.addWidget(self.category_check)
         layout.addWidget(self.category_list)
+        layout.addWidget(self.logo_label)  
+        layout.addWidget(self.image_label)
         layout.addWidget(self.delete_button)
         layout.addWidget(self.next_button)
         layout.addWidget(self.keep_button)
 
         self.setLayout(layout)
 
-    ### ✅ FIX: Drag & Drop Works Properly ###
     def dragEnterEvent(self, event: QDragEnterEvent):
-        """Accept drag event for images"""
+
+        """Accept drag event for images even after reset."""
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
 
     def dropEvent(self, event: QDropEvent):
-        """Handle dropped images"""
+
+        """Handle dropped images and restart image processing."""
         files = [url.toLocalFile() for url in event.mimeData().urls() if url.toLocalFile().lower().endswith(('.png', '.jpg', '.jpeg'))]
 
         if files:
             self.image_paths.extend(files)
             self.display_image()
+
 
     def upload_images(self):
         """Upload multiple images manually"""
@@ -216,50 +218,6 @@ class ImageApp(QWidget):
 
         self.display_image()
 
-    # def delete_image(self):
-    #     """Deletes the current image safely and updates UI"""
-    #     if self.view_by_category and self.current_category:
-    #         category_images = self.categorized_images.get(self.current_category, [])
-    #         if not category_images:
-    #             return
-    #         img_path = category_images.pop(self.current_index)
-
-    #         if not category_images:
-    #             del self.categorized_images[self.current_category]  # Remove empty category
-    #             self.update_category_list()
-
-    #     else:
-    #         if not self.image_paths:
-    #             return
-    #         img_path = self.image_paths.pop(self.current_index)
-
-    #     try:
-    #         os.remove(img_path)  # Delete file
-    #     except Exception as e:
-    #         print(f"Error deleting image: {e}")
-
-    #     self.display_image()
-
-    # def delete_image(self):
-    #     """Deletes the current image safely"""
-    #     if not self.image_paths:
-    #         return
-
-    #     img_path = self.image_paths.pop(self.current_index)
-    #     try:
-    #         os.remove(img_path)  # Delete file
-    #     except Exception as e:
-    #         print(f"Error deleting image: {e}")
-
-    #     if not self.image_paths:
-    #         self.image_label.setText("No Images Left")
-    #         self.count_label.setText("")
-    #         self.category_label.setText("")
-    #         self.delete_button.setEnabled(False)
-    #         self.next_button.setEnabled(False)
-    #         return
-
-    #     self.display_image()
 
     def upload_to_api(self, image_path):
         """Send image to FastAPI for AI categorization"""
@@ -282,20 +240,23 @@ class ImageApp(QWidget):
 
 
     def display_image(self):
-        """Displays the current image and ensures kept images do not reappear."""
-        # Remove kept images from list
+        """Displays the current image and resets the app when all images are viewed or kept."""
+        
+        # Remove kept images from the list
         self.image_paths = [img for img in self.image_paths if img not in self.kept_images]
 
+        # ✅ If all images in category are viewed, show completion dialog
+        print(self.categorized_images)
         if self.view_by_category and self.current_category:
             category_images = self.categorized_images.get(self.current_category, [])
             category_images = [img for img in category_images if img not in self.kept_images]
 
             if not category_images:
                 reply = QMessageBox.question(self, "Category Completed", 
-                    "All images in this category are viewed", 
+                    "All images in this category are viewed. Do you want to check remaining images?", 
                     QMessageBox.StandardButton.Ok)
                 
-                if reply == QMessageBox.StandardButton.Ok:
+                if reply == QMessageBox.StandardButton.Yes:
                     self.view_by_category = False
                     self.category_check.setChecked(False)
                     self.display_image()
@@ -306,21 +267,23 @@ class ImageApp(QWidget):
             
             img_path = category_images[self.current_index % len(category_images)]
             self.count_label.setText(f"Total Images: {len(category_images)}")
-
+            print(f"Category: {category_images}")
+            
+        
         else:
+            # ✅ If all images (including non-categorized) are viewed, reset the app
             if not self.image_paths:
                 if self.categorized_images:
                     reply = QMessageBox.question(self, "All Images Completed", 
-                        "All images without categories are viewed", 
+                        "All images have been viewed or kept. Do you want to restart the app?", 
                         QMessageBox.StandardButton.Ok)
 
                     if reply == QMessageBox.StandardButton.Ok:
-                        self.view_by_category = True
-                        self.category_list.setVisible(True)
-                        self.image_label.setText("📂 Select a category from the list")
+                        self.reset_app()
                     else:
                         self.image_label.setText("No more images left")
                         self.count_label.setText("")
+                        self.category_label.setText("")
                 else:
                     self.image_label.setText("No Images Left")
                     self.category_label.setText("")
@@ -328,6 +291,7 @@ class ImageApp(QWidget):
                     self.delete_button.setEnabled(False)
                     self.next_button.setEnabled(False)
                     self.keep_button.setEnabled(False)
+                    self.reset_app()
                 return
 
             img_path = self.image_paths[self.current_index % len(self.image_paths)]
@@ -342,35 +306,30 @@ class ImageApp(QWidget):
         self.next_button.setEnabled(True)
         self.keep_button.setEnabled(True)
 
+    def reset_app(self):
+        print("Resetting the app")
+        """Resets the application to its initial state while keeping Drag & Drop enabled."""
+        self.image_paths = []
+        self.kept_images = set()
+        self.categorized_images = {}
+        self.current_index = 0
+        self.view_by_category = False
+        self.current_category = None
 
-    # def display_image(self):
-    #     """Displays the current image correctly"""
-    #     if self.view_by_category and self.current_category:
-    #         category_images = self.categorized_images.get(self.current_category, [])
-    #         if not category_images:
-    #             self.image_label.setText("No images in this category")
-    #             self.count_label.setText("")
-    #             return
-    #         img_path = category_images[self.current_index % len(category_images)]
-    #         self.count_label.setText(f"Total Images: {len(category_images)}")
-    #     else:
-    #         if not self.image_paths:
-    #             self.image_label.setText("No Images Left")
-    #             self.category_label.setText("")
-    #             self.count_label.setText("")
-    #             self.delete_button.setEnabled(False)
-    #             self.next_button.setEnabled(False)
-    #             return
-    #         img_path = self.image_paths[self.current_index % len(self.image_paths)]
-    #         self.count_label.setText(f"Total Images: {len(self.image_paths)}")
+        self.category_list.clear()
+        self.image_label.setText("Drag & Drop Images Here")
+        self.category_label.setText("")
+        self.count_label.setText("")
+        self.category_check.setChecked(False)
 
-    #     pixmap = QPixmap(img_path)
-    #     self.image_label.setPixmap(pixmap.scaled(500, 400, Qt.AspectRatioMode.KeepAspectRatio))
-    #     self.category_label.setText(f"Category: {self.current_category if self.view_by_category else 'All Images'}")
+        # ✅ Disable buttons until new images are uploaded
+        self.delete_button.setEnabled(False)
+        self.next_button.setEnabled(False)
+        self.keep_button.setEnabled(False)
 
-    #     # ✅ Enable buttons when images are available
-    #     self.delete_button.setEnabled(True)
-    #     self.next_button.setEnabled(True)
+        # ✅ Re-enable drag & drop functionality
+        self.setAcceptDrops(True)
+
 
     def next_image(self):
         """Displays the next image properly"""
@@ -386,41 +345,6 @@ class ImageApp(QWidget):
 
         self.display_image()
 
-    # def display_image(self):
-    #     """Displays the current image correctly"""
-    #     if self.view_by_category and self.current_category:
-    #         category_images = self.categorized_images.get(self.current_category, [])
-    #         if not category_images:
-    #             self.image_label.setText("No images in this category")
-    #             return
-    #         img_path = category_images[self.current_index % len(category_images)]
-    #         self.count_label.setText(f"Total Images: {len(category_images)}")
-    #     else:
-    #         if not self.image_paths:
-    #             self.image_label.setText("No Images Left")
-    #             self.category_label.setText("")
-    #             self.count_label.setText("")
-    #             return
-    #         img_path = self.image_paths[self.current_index % len(self.image_paths)]
-    #         self.count_label.setText(f"Total Images: {len(self.image_paths)}")
-
-    #     pixmap = QPixmap(img_path)
-    #     self.image_label.setPixmap(pixmap.scaled(500, 400, Qt.AspectRatioMode.KeepAspectRatio))
-    #     self.category_label.setText(f"Category: {self.current_category if self.view_by_category else 'All Images'}")
-
-    # def next_image(self):
-    #     """Displays the next image properly"""
-    #     if self.view_by_category and self.current_category:
-    #         category_images = self.categorized_images.get(self.current_category, [])
-    #         if not category_images:
-    #             return
-    #         self.current_index = (self.current_index + 1) % len(category_images)
-    #     else:
-    #         if not self.image_paths:
-    #             return
-    #         self.current_index = (self.current_index + 1) % len(self.image_paths)
-
-    #     self.display_image()
 
     def keep_image(self):
         """Marks the current image as kept so it won't be displayed again."""
@@ -435,7 +359,7 @@ class ImageApp(QWidget):
                 self.update_category_list()
 
         else:
-            if not self.image_paths:
+            if not self.image_paths or not self.image_paths[self.current_index]:
                 return
             img_path = self.image_paths.pop(self.current_index)
 
@@ -449,35 +373,3 @@ if __name__ == "__main__":
     window.show()
     sys.exit(app.exec())
 
-
-'''
-
-
-   def delete_image(self):
-        """Deletes the current image safely"""
-        if self.view_by_category and self.current_category:
-            category_images = self.categorized_images.get(self.current_category, [])
-            if not category_images:
-                return
-            img_path = category_images.pop(self.current_index)
-            if not category_images:
-                del self.categorized_images[self.current_category]
-
-        else:
-            if not self.image_paths:
-                return
-            img_path = self.image_paths.pop(self.current_index)
-
-        try:
-            os.remove(img_path)  # Delete file
-        except Exception as e:
-            print(f"Error deleting image: {e}")
-
-        self.display_image()
-
-    def next_image(self):
-        """Displays the next image safely"""
-        self.current_index = (self.current_index + 1) % (len(self.image_paths) if not self.view_by_category else len(self.categorized_images.get(self.current_category, [])))
-        self.display_image()
-        
-        '''

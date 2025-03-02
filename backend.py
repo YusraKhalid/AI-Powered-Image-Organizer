@@ -29,16 +29,17 @@ app.add_middleware(
 
 def categorize_image(image_path):
     """Uses Google Gemini AI to categorize an image"""
-    try:
-        model = genai.GenerativeModel("gemini-2.0-flash")
-        image = Image.open(image_path)
-        response = model.generate_content([
-            f"Categorize this image based on {CATEGORY_LIST}. Only reply with one word from the list.", image
-        ])
-        category = response.text.strip().replace("\n", "")
-        return category if category in CATEGORY_LIST else "Uncategorized"
-    except:
-        return "Uncategorized"
+    # try:
+    model = genai.GenerativeModel("gemini-2.0-flash")
+    image = Image.open(image_path)
+    response = model.generate_content([
+        f"Categorize this image based on {CATEGORY_LIST}. Only reply with one word from the list.", image
+    ])
+    category = response.text.strip().replace("\n", "")
+    print(f"Categorized: {os.path.basename(image_path)} → {category}")
+    return category if category in CATEGORY_LIST else "Uncategorized"
+    # except:
+    #     return "Uncategorized"
 
 @app.post("/upload/")
 async def upload_image(image: UploadFile = File(...)):
