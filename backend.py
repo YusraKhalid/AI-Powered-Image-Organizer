@@ -8,7 +8,9 @@ import shutil
 app = FastAPI()
 
 # 🔑 Configure Google Gemini AI API Key
-genai.configure(api_key="AIzaSyDG477OzK1pn0LPou9-4eaVihRV75w_QjI")  # Replace with your actual key
+with open("api_key.txt", "r") as f:
+    api_key = f.read().strip()
+genai.configure(api_key=api_key)  # Replace with your actual key
 
 CATEGORY_LIST = ["Nature", "Landscape", "People", "Animals", "Food",
                  "Buildings", "Technology", "Vehicles", "Art", "Documents"]
